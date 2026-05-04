@@ -1,21 +1,8 @@
 services:
   cli-proxy-api:
-    image: ${CLI_PROXY_IMAGE:-ghcr.io/kittors/clirelay:latest}
+    image: ${CLI_PROXY_IMAGE:-ghcr.io/Pinevu/cpam:latest}
     pull_policy: ${CLI_PROXY_PULL_POLICY:-always}
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        VERSION: ${VERSION:-dev}
-        COMMIT: ${COMMIT:-none}
-        BUILD_DATE: ${BUILD_DATE:-unknown}
-        UI_VERSION: ${UI_VERSION:-dev}
-        FRONTEND_REPOSITORY: ${FRONTEND_REPOSITORY:-https://github.com/kittors/codeProxy.git}
-        FRONTEND_REF: ${FRONTEND_REF:-main}
-        FRONTEND_COMMIT: ${FRONTEND_COMMIT:-}
     container_name: cli-proxy-api
-    # env_file:
-    #   - .env
     environment:
       DEPLOY: ${DEPLOY:-}
       CLIRELAY_LOCALE: ${CLIRELAY_LOCALE:-zh}
@@ -42,7 +29,7 @@ services:
     restart: unless-stopped
 
   clirelay-updater:
-    image: ${CLI_PROXY_IMAGE:-ghcr.io/kittors/clirelay:latest}
+    image: ${CLI_PROXY_IMAGE:-ghcr.io/Pinevu/cpam:latest}
     pull_policy: ${CLI_PROXY_PULL_POLICY:-always}
     command: ["./clirelay-updater"]
     environment:
@@ -54,6 +41,5 @@ services:
       CLIRELAY_TARGET_SERVICE: ${CLIRELAY_TARGET_SERVICE:-cli-proxy-api}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker-compose.yml:${CLIRELAY_PROJECT_DIR:-${PWD:-.}}/docker-compose.yml:ro
       - ./.env:${CLIRELAY_PROJECT_DIR:-${PWD:-.}}/.env
     restart: unless-stopped

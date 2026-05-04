@@ -10,6 +10,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/cpam
+  VERSION: v1.0.0
+  UI_VERSION: v1.0.0
 
 jobs:
   build-and-push:
@@ -26,27 +28,18 @@ jobs:
         id: build_meta
         run: |
           set -euo pipefail
-          REF_NAME="${GITHUB_REF_NAME:-main}"
           BACKEND_SHORT="$(git rev-parse --short HEAD)"
-          FRONTEND_REF="${REF_NAME}"
+          BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          FRONTEND_REF="${GITHUB_REF_NAME:-main}"
           FRONTEND_COMMIT="$(git ls-remote https://github.com/kittors/codeProxy.git "refs/heads/${FRONTEND_REF}" | awk '{print $1}')"
           if [ -z "${FRONTEND_COMMIT}" ]; then
-            echo "Frontend ref not found, falling back to main" >&2
             FRONTEND_REF="main"
             FRONTEND_COMMIT="$(git ls-remote https://github.com/kittors/codeProxy.git "refs/heads/main" | awk '{print $1}')"
-            if [ -z "${FRONTEND_COMMIT}" ]; then
-              echo "Unable to resolve frontend ref: main" >&2
-              exit 1
-            fi
           fi
-          FRONTEND_SHORT="${FRONTEND_COMMIT:0:7}"
-          echo "VERSION=${REF_NAME}-${BACKEND_SHORT}" >> "$GITHUB_ENV"
-          echo "UI_VERSION=panel-${FRONTEND_REF}-${FRONTEND_SHORT}" >> "$GITHUB_ENV"
+          echo "BUILD_DATE=${BUILD_DATE}" >> "$GITHUB_ENV"
           echo "FRONTEND_REF=${FRONTEND_REF}" >> "$GITHUB_ENV"
           echo "FRONTEND_COMMIT=${FRONTEND_COMMIT}" >> "$GITHUB_ENV"
           echo "backend_short=${BACKEND_SHORT}" >> "$GITHUB_OUTPUT"
-          echo "frontend_short=${FRONTEND_SHORT}" >> "$GITHUB_OUTPUT"
-          echo "frontend_commit=${FRONTEND_COMMIT}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -70,13 +63,10 @@ jobs:
             type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
             type=raw,value=main,enable=${{ github.ref_name == 'main' }}
             type=raw,value=dev,enable=${{ github.ref_name == 'dev' }}
-            type=raw,value=${{ github.ref_name }}-${{ steps.build_meta.outputs.backend_short }}
+            type=raw,value=${{ env.VERSION }}
+            type=raw,value=${{ env.VERSION }}-${{ steps.build_meta.outputs.backend_short }}
             type=sha,prefix=
             type=raw,value={{date 'YYYYMMDD'}}
-
-      - name: Get build date
-        id: build_date
-        run: echo "date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -89,7 +79,7 @@ jobs:
           build-args: |
             VERSION=${{ env.VERSION }}
             COMMIT=${{ github.sha }}
-            BUILD_DATE=${{ steps.build_date.outputs.date }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
             UI_VERSION=${{ env.UI_VERSION }}
             FRONTEND_REF=${{ env.FRONTEND_REF }}
             FRONTEND_COMMIT=${{ env.FRONTEND_COMMIT }}
