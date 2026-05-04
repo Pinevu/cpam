@@ -31,8 +31,13 @@ jobs:
           FRONTEND_REF="${REF_NAME}"
           FRONTEND_COMMIT="$(git ls-remote https://github.com/kittors/codeProxy.git "refs/heads/${FRONTEND_REF}" | awk '{print $1}')"
           if [ -z "${FRONTEND_COMMIT}" ]; then
-            echo "Unable to resolve frontend ref: ${FRONTEND_REF}" >&2
-            exit 1
+            echo "Frontend ref not found, falling back to main" >&2
+            FRONTEND_REF="main"
+            FRONTEND_COMMIT="$(git ls-remote https://github.com/kittors/codeProxy.git "refs/heads/main" | awk '{print $1}')"
+            if [ -z "${FRONTEND_COMMIT}" ]; then
+              echo "Unable to resolve frontend ref: main" >&2
+              exit 1
+            fi
           fi
           FRONTEND_SHORT="${FRONTEND_COMMIT:0:7}"
           echo "VERSION=${REF_NAME}-${BACKEND_SHORT}" >> "$GITHUB_ENV"
@@ -88,5 +93,4 @@ jobs:
             UI_VERSION=${{ env.UI_VERSION }}
             FRONTEND_REF=${{ env.FRONTEND_REF }}
             FRONTEND_COMMIT=${{ env.FRONTEND_COMMIT }}
-          cache-from: type=gha
           cache-to: type=gha,mode=max
