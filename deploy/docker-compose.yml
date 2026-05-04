@@ -1,0 +1,31 @@
+services:
+  clirelay:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+        COMMIT: ${COMMIT:-none}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+        UI_VERSION: ${UI_VERSION:-dev}
+        FRONTEND_REPOSITORY: ${FRONTEND_REPOSITORY:-https://github.com/kittors/codeProxy.git}
+        FRONTEND_REF: ${FRONTEND_REF:-main}
+        FRONTEND_COMMIT: ${FRONTEND_COMMIT:-}
+    image: clirelay:local
+    container_name: clirelay
+    restart: unless-stopped
+    ports:
+      - "8319:8319"
+    environment:
+      TZ: Asia/Shanghai
+      CLIRELAY_LOCALE: zh
+      AUTH_PATH: /CLIProxyAPI/auths
+      LANG: C.UTF-8
+      LANGUAGE: zh_CN:zh
+      LC_ALL: C.UTF-8
+      PORT: 8319
+    volumes:
+      - ./config.yaml:/CLIProxyAPI/config.yaml:ro
+      - ./auths:/CLIProxyAPI/auths
+      - ./logs:/CLIProxyAPI/logs
+      - ./data:/CLIProxyAPI/data
