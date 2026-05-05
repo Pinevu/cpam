@@ -16,14 +16,15 @@ if (fs.existsSync(manageHtml)) {
     '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover\" />'
   );
   const mobileGuard = `<style id="cpam-mobile-viewport-guard">
-html,body,#root{width:100%;max-width:100%;overflow-x:hidden;}
-#root>div{width:100%;max-width:100%;overflow-x:hidden;}
+html,body,#root{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior:none;}
+#root>div{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior:none;}
+main,[class*="overflow-y-auto"],[class*="overflow-y-scroll"]{overscroll-behavior-y:contain;}
 *{box-sizing:border-box;}
 @media (max-width:640px){input,textarea,select{font-size:16px!important;line-height:1.5!important;} input::placeholder,textarea::placeholder{font-size:16px!important;}}
 </style><script id="cpam-mobile-scroll-guard">
-(function(){function r(){try{document.documentElement.scrollLeft=0;document.body.scrollLeft=0;}catch(e){}};
-window.addEventListener('pageshow',r,{passive:true});window.addEventListener('resize',r,{passive:true});
-new MutationObserver(r).observe(document.documentElement,{childList:true,subtree:true});setTimeout(r,0);setTimeout(r,300);})();
+(function(){function a(){return !!document.querySelector('aside')&&!/\/manage\/login(?:$|[?#/])/.test(location.pathname)}function r(y){try{document.documentElement.scrollLeft=0;document.body.scrollLeft=0;if(y||a()){window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0}}catch(e){}};
+window.addEventListener('pageshow',function(){r(true)},{passive:true});window.addEventListener('resize',function(){r(true)},{passive:true});window.addEventListener('orientationchange',function(){setTimeout(function(){r(true)},50)},{passive:true});window.addEventListener('scroll',function(){if(a())r(true)},{passive:true});window.addEventListener('touchend',function(){if(a())setTimeout(function(){r(true)},0)},{passive:true});
+new MutationObserver(function(){r(false)}).observe(document.documentElement,{childList:true,subtree:true});setTimeout(function(){r(true)},0);setTimeout(function(){r(true)},300);})();
 </script>`;
   if (!html.includes('cpam-mobile-viewport-guard')) {
     html = html.replace('</head>', mobileGuard + '</head>');
@@ -121,7 +122,8 @@ for (const name of fs.readdirSync(dir)) {
   s = s.replaceAll('J=5e4,Qe=2e3', 'J=2e3,Qe=500');
 
   // Mobile page fit: keep authenticated pages inside the visual viewport.
-  s = s.replaceAll('className:"flex min-h-full flex-col p-4 focus-visible:outline-none sm:p-6"', 'className:"flex min-h-full w-full min-w-0 max-w-full flex-col overflow-x-hidden p-4 focus-visible:outline-none sm:p-6"');
+  s = s.replaceAll('className:"flex min-h-full flex-col p-4 focus-visible:outline-none sm:p-6"', 'className:"flex min-h-full w-full min-w-0 max-w-full flex-col overflow-x-hidden overscroll-contain p-4 focus-visible:outline-none sm:p-6"');
+  s = s.replaceAll('className:"flex-1 overflow-y-auto overflow-x-hidden"', 'className:"flex-1 overflow-y-auto overflow-x-hidden overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch]"');
   s = s.replaceAll('relative min-h-[100dvh] overflow-hidden bg-zinc-50', 'relative w-full max-w-full min-h-[100dvh] overflow-hidden bg-zinc-50');
   s = s.replaceAll('scrollbar-hidden relative inline-flex max-w-full gap-0.5 overflow-x-auto whitespace-nowrap', 'scrollbar-hidden relative flex w-full min-w-0 max-w-full gap-0.5 overflow-x-auto whitespace-nowrap');
   s = s.replaceAll('className:"space-y-6"', 'className:"min-w-0 max-w-full space-y-6 overflow-x-hidden"');
