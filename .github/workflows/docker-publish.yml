@@ -10,8 +10,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/cpam
-  VERSION: v2.0.3
-  UI_VERSION: v2.0.3
+  VERSION: v2.0.4
+  UI_VERSION: v2.0.4
 
 jobs:
   build-and-push:

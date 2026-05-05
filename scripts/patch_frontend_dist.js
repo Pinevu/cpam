@@ -52,6 +52,8 @@ for (const name of fs.readdirSync(dir)) {
   s = s.replaceAll('min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y px-5 py-3 pb-6 sm:pb-4', 'min-h-0 flex-1 overflow-y-scroll overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch] px-4 py-2.5 pb-3 sm:px-5 sm:py-4 sm:pb-4');
 
   // Footer compact and always visible as a flex child, not sticky to Safari toolbar.
+  s = s.replaceAll('className:"flex flex-wrap items-center justify-end gap-2 border-t border-slate-200 px-5 py-4 dark:border-neutral-800"', 'className:"shrink-0 flex flex-wrap items-center justify-end gap-2 border-t border-slate-200 px-4 py-2 dark:border-neutral-800"');
+  s = s.replaceAll('className:"flex flex-wrap items-center gap-2"', 'className:"flex flex-wrap items-center gap-1.5"');
   s = s.replaceAll('sticky bottom-0 z-30', 'shrink-0 z-30');
   s = s.replaceAll('sticky bottom-0 z-20', 'shrink-0 z-20');
   s = s.replace(/,style:\{bottom:\/iPad\|iPhone\|iPod\/.test\(navigator\.userAgent\)\?"calc\(env\(safe-area-inset-bottom\) \+ 5\.5rem\)":"env\(safe-area-inset-bottom\)"\}/g, '');
