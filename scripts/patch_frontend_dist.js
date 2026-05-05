@@ -13,12 +13,13 @@ if (fs.existsSync(manageHtml)) {
   const beforeHtml = html;
   html = html.replace(
     /<meta name=\"viewport\" content=\"[^\"]*\"\s*\/>/,
-    '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\" />'
+    '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover\" />'
   );
   const mobileGuard = `<style id="cpam-mobile-viewport-guard">
 html,body,#root{width:100%;max-width:100%;overflow-x:hidden;}
 #root>div{width:100%;max-width:100%;overflow-x:hidden;}
 *{box-sizing:border-box;}
+@media (max-width:640px){input,textarea,select{font-size:16px!important;line-height:1.5!important;} input::placeholder,textarea::placeholder{font-size:16px!important;}}
 </style><script id="cpam-mobile-scroll-guard">
 (function(){function r(){try{document.documentElement.scrollLeft=0;document.body.scrollLeft=0;}catch(e){}};
 window.addEventListener('pageshow',r,{passive:true});window.addEventListener('resize',r,{passive:true});
