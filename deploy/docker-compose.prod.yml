@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  cli-proxy-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: v1.0.0
+        COMMIT: local-ui-fix
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+        UI_VERSION: v1.0.0
+        FRONTEND_REPOSITORY: https://github.com/kittors/codeProxy.git
+        FRONTEND_REF: main
+    image: cpam:local-ui-fix
+    container_name: cpam
+    restart: unless-stopped
+    environment:
+      CLIRELAY_LOCALE: zh
+      CLIRELAY_UPDATE_CHANNEL: main
+      CLIRELAY_UPDATER_URL: http://clirelay-updater:8320
+      CLIRELAY_TARGET_SERVICE: cli-proxy-api
+      AUTH_PATH: /root/.cli-proxy-api
+      LANG: C.UTF-8
+      LANGUAGE: en_US:en
+      LC_ALL: C.UTF-8
+    ports:
+      - "8319:8317"
+    volumes:
+      - ./config.yaml:/CLIProxyAPI/config.yaml
+      - ./auths:/root/.cli-proxy-api
+      - ./logs:/CLIProxyAPI/logs
+      - ./data:/CLIProxyAPI/data
+
+  clirelay-updater:
+    image: cpam:local-ui-fix
+    container_name: cpam-updater
+    restart: unless-stopped
+    command: ["./clirelay-updater"]
+    environment:
+      CLIRELAY_PROJECT_DIR: /opt/cpam
+      CLIRELAY_COMPOSE_FILE: /opt/cpam/docker-compose.yml
+      CLIRELAY_ENV_FILE: /opt/cpam/.env
+      CLIRELAY_TARGET_SERVICE: cli-proxy-api
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-compose.yml:/opt/cpam/docker-compose.yml:ro
+      - ./.env:/opt/cpam/.env
