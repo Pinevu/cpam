@@ -113,6 +113,10 @@ for (const name of fs.readdirSync(dir)) {
   s = s.replaceAll('nav_api_keys:"API Keys"', 'nav_api_keys:"API Key"');
   s = s.replaceAll('nav_ccswitch_import_settings:"CC Switch 导入"', 'nav_ccswitch_import_settings:"Switch导入"');
 
+  // Update modal: make current-version commit labels clickable too.
+  s = s.replaceAll('j.current_commit?d.jsxs("p",{className:ct,children:[M("auto_update.commit"),": ",xl(j.current_commit)]}):null', 'j.current_commit?j.current_commit_url?d.jsxs("a",{href:j.current_commit_url,target:"_blank",rel:"noreferrer",className:I?"mt-1 block truncate text-xs text-emerald-700 hover:underline dark:text-emerald-200":"mt-1 block truncate text-xs text-indigo-600 hover:underline dark:text-indigo-300",children:[M("auto_update.commit"),": ",xl(j.current_commit)]}):d.jsxs("p",{className:ct,children:[M("auto_update.commit"),": ",xl(j.current_commit)]}):null');
+  s = s.replaceAll('j.current_ui_commit?d.jsxs("p",{className:ct,children:[M("auto_update.commit"),": ",xl(j.current_ui_commit)]}):null', 'j.current_ui_commit?j.current_ui_commit_url?d.jsxs("a",{href:j.current_ui_commit_url,target:"_blank",rel:"noreferrer",className:I?"mt-1 block truncate text-xs text-emerald-700 hover:underline dark:text-emerald-200":"mt-1 block truncate text-xs text-indigo-600 hover:underline dark:text-indigo-300",children:[M("auto_update.commit"),": ",xl(j.current_ui_commit)]}):d.jsxs("p",{className:ct,children:[M("auto_update.commit"),": ",xl(j.current_ui_commit)]}):null');
+
   // Logs page: avoid oversized initial fetch.
   s = s.replaceAll('J=5e4,Qe=2e3', 'J=2e3,Qe=500');
 

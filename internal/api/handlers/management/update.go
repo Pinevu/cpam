@@ -31,11 +31,13 @@ const (
 
 type updateCheckResponse struct {
 	Enabled           bool   `json:"enabled"`
-	CurrentVersion    string `json:"current_version"`
-	CurrentCommit     string `json:"current_commit"`
-	CurrentUIVersion  string `json:"current_ui_version,omitempty"`
-	CurrentUICommit   string `json:"current_ui_commit,omitempty"`
-	BuildDate         string `json:"build_date"`
+	CurrentVersion     string `json:"current_version"`
+	CurrentCommit      string `json:"current_commit"`
+	CurrentCommitURL   string `json:"current_commit_url,omitempty"`
+	CurrentUIVersion   string `json:"current_ui_version,omitempty"`
+	CurrentUICommit    string `json:"current_ui_commit,omitempty"`
+	CurrentUICommitURL string `json:"current_ui_commit_url,omitempty"`
+	BuildDate          string `json:"build_date"`
 	TargetChannel     string `json:"target_channel"`
 	LatestVersion     string `json:"latest_version"`
 	LatestCommit      string `json:"latest_commit"`
@@ -261,25 +263,27 @@ func (h *Handler) buildUpdateCheck(ctx context.Context) (*updateCheckResponse, e
 	frontendUpdateAvailable := frontendErr == nil && autoUpdateAvailableFromCommit(currentUICommit, frontendBranch.SHA)
 
 	resp := &updateCheckResponse{
-		Enabled:           cfg.AutoUpdate.Enabled,
-		CurrentVersion:    currentVersion,
-		CurrentCommit:     currentCommit,
-		CurrentUIVersion:  currentUIVersion,
-		CurrentUICommit:   currentUICommit,
-		BuildDate:         buildinfo.BuildDate,
-		TargetChannel:     channel,
-		LatestVersion:     latestVersion,
-		LatestCommit:      latestCommit,
-		LatestCommitURL:   latestCommitURL,
-		LatestUIVersion:   latestUIVersion,
-		LatestUICommit:    latestUICommit,
-		LatestUICommitURL: latestUICommitURL,
-		DockerImage:       cfg.AutoUpdate.DockerImage,
-		DockerTag:         dockerTagForChannel(channel, branch.SHA),
-		ReleaseNotes:      releaseNotes,
-		ReleaseURL:        strings.TrimSpace(release.HTMLURL),
-		UpdateAvailable:   cfg.AutoUpdate.Enabled && (backendUpdateAvailable || frontendUpdateAvailable),
-		UpdaterAvailable:  checkUpdaterAvailable(ctx, cfg),
+		Enabled:            cfg.AutoUpdate.Enabled,
+		CurrentVersion:     currentVersion,
+		CurrentCommit:      currentCommit,
+		CurrentCommitURL:   githubCommitURL(repo, currentCommit),
+		CurrentUIVersion:   currentUIVersion,
+		CurrentUICommit:    currentUICommit,
+		CurrentUICommitURL: githubCommitURL(frontendRepo, currentUICommit),
+		BuildDate:          buildinfo.BuildDate,
+		TargetChannel:      channel,
+		LatestVersion:      latestVersion,
+		LatestCommit:       latestCommit,
+		LatestCommitURL:    latestCommitURL,
+		LatestUIVersion:    latestUIVersion,
+		LatestUICommit:     latestUICommit,
+		LatestUICommitURL:  latestUICommitURL,
+		DockerImage:        cfg.AutoUpdate.DockerImage,
+		DockerTag:          dockerTagForChannel(channel, branch.SHA),
+		ReleaseNotes:       releaseNotes,
+		ReleaseURL:         strings.TrimSpace(release.HTMLURL),
+		UpdateAvailable:    cfg.AutoUpdate.Enabled && (backendUpdateAvailable || frontendUpdateAvailable),
+		UpdaterAvailable:   checkUpdaterAvailable(ctx, cfg),
 	}
 	if !resp.Enabled {
 		resp.Message = "auto update disabled"
@@ -304,18 +308,22 @@ func (h *Handler) buildCurrentUpdateState(ctx context.Context) *updateCheckRespo
 	}
 
 	currentUIVersion, currentUICommit := h.currentFrontendState()
+	repo := normalizeGitHubRepository(cfg.AutoUpdate.Repository)
+	frontendRepo := normalizeGitHubRepository(cfg.RemoteManagement.PanelGitHubRepository)
 
 	return &updateCheckResponse{
-		Enabled:          cfg.AutoUpdate.Enabled,
-		CurrentVersion:   currentUpdateDisplayVersion(buildinfo.Version),
-		CurrentCommit:    strings.TrimSpace(buildinfo.Commit),
-		CurrentUIVersion: currentUIVersion,
-		CurrentUICommit:  currentUICommit,
-		BuildDate:        buildinfo.BuildDate,
-		TargetChannel:    channel,
-		DockerImage:      cfg.AutoUpdate.DockerImage,
-		DockerTag:        dockerTagForChannel(channel, ""),
-		UpdaterAvailable: checkUpdaterAvailable(ctx, cfg),
+		Enabled:            cfg.AutoUpdate.Enabled,
+		CurrentVersion:     currentUpdateDisplayVersion(buildinfo.Version),
+		CurrentCommit:      strings.TrimSpace(buildinfo.Commit),
+		CurrentCommitURL:   githubCommitURL(repo, buildinfo.Commit),
+		CurrentUIVersion:   currentUIVersion,
+		CurrentUICommit:    currentUICommit,
+		CurrentUICommitURL: githubCommitURL(frontendRepo, currentUICommit),
+		BuildDate:          buildinfo.BuildDate,
+		TargetChannel:      channel,
+		DockerImage:        cfg.AutoUpdate.DockerImage,
+		DockerTag:          dockerTagForChannel(channel, ""),
+		UpdaterAvailable:   checkUpdaterAvailable(ctx, cfg),
 	}
 }
 
@@ -524,6 +532,15 @@ func normalizeGitHubRepository(repo string) string {
 
 func githubAPIURL(repo string, path string) string {
 	return "https://api.github.com/repos/" + strings.Trim(repo, "/") + "/" + strings.TrimLeft(path, "/")
+}
+
+func githubCommitURL(repo string, commit string) string {
+	repo = normalizeGitHubRepository(repo)
+	commit = strings.TrimSpace(commit)
+	if repo == "" || commit == "" || strings.EqualFold(commit, "none") {
+		return ""
+	}
+	return "https://github.com/" + strings.Trim(repo, "/") + "/commit/" + commit
 }
 
 func applyGitHubAPIHeaders(req *http.Request) {
