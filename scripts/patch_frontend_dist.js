@@ -105,13 +105,12 @@ for (const name of fs.readdirSync(dir)) {
   s = s.replaceAll('className:"mt-2"', 'className:"mt-1.5"');
   s = s.replaceAll('className:"mt-2 text-xs text-slate-500 dark:text-white/55"', 'className:"hidden"');
 
+  // Hide Switch import from sidebar navigation only; keep page/route available for later.
+  s = s.replaceAll('{to:"/ccswitch-import-settings",i18nKey:"shell.nav_ccswitch_import_settings",icon:Q},', '');
+
   // Text-only navigation wording customizations.
   s = s.replaceAll('nav_api_keys:"API Keys"', 'nav_api_keys:"API Key"');
   s = s.replaceAll('nav_ccswitch_import_settings:"CC Switch 导入"', 'nav_ccswitch_import_settings:"Switch导入"');
-
-  // Display the public management endpoint without the legacy /v0 prefix on the System page.
-  // Keep the real frontend API base (/v0/management) unchanged for compatibility.
-  s = s.replaceAll('return o?`${o}${Wh}`:""', 'return o?`${o}/management`:""');
 
   // Logs page: avoid oversized initial fetch.
   s = s.replaceAll('J=5e4,Qe=2e3', 'J=2e3,Qe=500');
