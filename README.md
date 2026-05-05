@@ -1,6 +1,6 @@
 # cpam
 
-`cpam` 是基于 [CliRelay](https://github.com/kittors/CliRelay) 的自用二开版本，目标是作为可直接部署、可升级、可回滚的私有代理服务。
+`cpam` 是基于 CAPMC 二开版本，目标是作为可直接部署、可升级、可回滚的私有代理服务。
 
 ## 主要特性
 - Docker Compose 一键部署
