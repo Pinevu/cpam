@@ -354,6 +354,15 @@ func NewServer(cfg *config.Config, authManager *auth.Manager, accessManager *sdk
 // setupRoutes configures the API routes for the server.
 // It defines the endpoints and associates them with their respective handlers.
 func (s *Server) setupRoutes() {
+	// Backward-compatible short alias used by the customised admin panel display.
+	// Keep /v0/management as the real frontend API base; this alias is enough for
+	// the copied management endpoint shown on the System page.
+	s.engine.GET("/management", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/v0/management")
+	})
+	s.engine.GET("/management/*filepath", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/v0/management"+c.Param("filepath"))
+	})
 	s.engine.GET("/management.html", s.serveManagementControlPanel)
 	s.engine.GET("/manage", s.serveManagementControlPanel)
 	s.engine.GET("/manage/*filepath", s.serveManagementControlPanel)
