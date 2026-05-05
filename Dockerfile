@@ -37,13 +37,9 @@ ENV VITE_PANEL_REF=${FRONTEND_REF}
 ENV VITE_PANEL_COMMIT=${FRONTEND_COMMIT}
 ENV VITE_PANEL_BUILD_DATE=${BUILD_DATE}
 RUN bun install --frozen-lockfile
-COPY assets/ProvidersPage-0L7n4oMq.js /tmp/local-assets/ProvidersPage-0L7n4oMq.js
-COPY assets/LogsPage-DAbeWWDE.js /tmp/local-assets/LogsPage-DAbeWWDE.js
-COPY assets/AppShell-BvmNpJcM.js /tmp/local-assets/AppShell-BvmNpJcM.js
+COPY scripts/patch_frontend_dist.js /tmp/patch_frontend_dist.js
 RUN bunx vite build \
-  && cp /tmp/local-assets/ProvidersPage-0L7n4oMq.js /frontend/dist/assets/ProvidersPage-0L7n4oMq.js \
-  && cp /tmp/local-assets/LogsPage-DAbeWWDE.js /frontend/dist/assets/LogsPage-DAbeWWDE.js \
-  && cp /tmp/local-assets/AppShell-BvmNpJcM.js /frontend/dist/assets/AppShell-BvmNpJcM.js
+  && node /tmp/patch_frontend_dist.js /frontend/dist/assets
 
 # ── Backend build ────────────────────────────────────────────────────────────
 FROM --platform=$BUILDPLATFORM golang:1.26.1-alpine AS backend-builder
