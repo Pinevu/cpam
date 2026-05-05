@@ -3,7 +3,34 @@ const fs = require('fs');
 const path = require('path');
 
 const dir = process.argv[2] || '/frontend/dist/assets';
+const distRoot = path.dirname(dir);
 let patched = [];
+
+// Patch generated manage.html as well as hashed assets.
+const manageHtml = path.join(distRoot, 'manage.html');
+if (fs.existsSync(manageHtml)) {
+  let html = fs.readFileSync(manageHtml, 'utf8');
+  const beforeHtml = html;
+  html = html.replace(
+    /<meta name=\"viewport\" content=\"[^\"]*\"\s*\/>/,
+    '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\" />'
+  );
+  const mobileGuard = `<style id="cpam-mobile-viewport-guard">
+html,body,#root{width:100%;max-width:100%;overflow-x:hidden;}
+*{box-sizing:border-box;}
+</style><script id="cpam-mobile-scroll-guard">
+(function(){function r(){try{document.documentElement.scrollLeft=0;document.body.scrollLeft=0;}catch(e){}};
+window.addEventListener('pageshow',r,{passive:true});window.addEventListener('resize',r,{passive:true});
+new MutationObserver(r).observe(document.documentElement,{childList:true,subtree:true});setTimeout(r,0);setTimeout(r,300);})();
+</script>`;
+  if (!html.includes('cpam-mobile-viewport-guard')) {
+    html = html.replace('</head>', mobileGuard + '</head>');
+  }
+  if (html !== beforeHtml) {
+    fs.writeFileSync(manageHtml, html);
+    patched.push('manage.html');
+  }
+}
 
 for (const name of fs.readdirSync(dir)) {
   if (!name.endsWith('.js')) continue;
@@ -87,6 +114,11 @@ for (const name of fs.readdirSync(dir)) {
 
   // Logs page: avoid oversized initial fetch.
   s = s.replaceAll('J=5e4,Qe=2e3', 'J=2e3,Qe=500');
+
+  // Mobile page fit: keep authenticated pages inside the visual viewport.
+  s = s.replaceAll('className:"flex min-h-full flex-col p-4 focus-visible:outline-none sm:p-6"', 'className:"flex min-h-full w-full min-w-0 max-w-full flex-col overflow-x-hidden p-4 focus-visible:outline-none sm:p-6"');
+  s = s.replaceAll('scrollbar-hidden relative inline-flex max-w-full gap-0.5 overflow-x-auto whitespace-nowrap', 'scrollbar-hidden relative flex w-full min-w-0 max-w-full gap-0.5 overflow-x-auto whitespace-nowrap');
+  s = s.replaceAll('className:"space-y-6"', 'className:"min-w-0 max-w-full space-y-6 overflow-x-hidden"');
 
   // Mobile sidebar width consistency.
   s = s.replaceAll('fixed inset-y-0 left-0 z-40 w-56', 'fixed inset-y-0 left-0 z-40 w-64 max-w-[82vw]');
