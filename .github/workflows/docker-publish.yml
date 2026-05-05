@@ -31,10 +31,10 @@ jobs:
           BACKEND_SHORT="$(git rev-parse --short HEAD)"
           BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           FRONTEND_REF="${GITHUB_REF_NAME:-main}"
-          FRONTEND_COMMIT="$(git ls-remote https://github.com/kittors/codeProxy.git "refs/heads/${FRONTEND_REF}" | awk '{print $1}')"
+          FRONTEND_COMMIT="$(git ls-remote https://github.com/Pinevu/codeProxy.git "refs/heads/${FRONTEND_REF}" | awk '{print $1}')"
           if [ -z "${FRONTEND_COMMIT}" ]; then
             FRONTEND_REF="main"
-            FRONTEND_COMMIT="$(git ls-remote https://github.com/kittors/codeProxy.git "refs/heads/main" | awk '{print $1}')"
+            FRONTEND_COMMIT="$(git ls-remote https://github.com/Pinevu/codeProxy.git "refs/heads/main" | awk '{print $1}')"
           fi
           echo "BUILD_DATE=${BUILD_DATE}" >> "$GITHUB_ENV"
           echo "FRONTEND_REF=${FRONTEND_REF}" >> "$GITHUB_ENV"
