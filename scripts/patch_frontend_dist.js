@@ -17,6 +17,7 @@ if (fs.existsSync(manageHtml)) {
   );
   const mobileGuard = `<style id="cpam-mobile-viewport-guard">
 html,body,#root{width:100%;max-width:100%;overflow-x:hidden;}
+#root>div{width:100%;max-width:100%;overflow-x:hidden;}
 *{box-sizing:border-box;}
 </style><script id="cpam-mobile-scroll-guard">
 (function(){function r(){try{document.documentElement.scrollLeft=0;document.body.scrollLeft=0;}catch(e){}};
@@ -117,6 +118,7 @@ for (const name of fs.readdirSync(dir)) {
 
   // Mobile page fit: keep authenticated pages inside the visual viewport.
   s = s.replaceAll('className:"flex min-h-full flex-col p-4 focus-visible:outline-none sm:p-6"', 'className:"flex min-h-full w-full min-w-0 max-w-full flex-col overflow-x-hidden p-4 focus-visible:outline-none sm:p-6"');
+  s = s.replaceAll('relative min-h-[100dvh] overflow-hidden bg-zinc-50', 'relative w-full max-w-full min-h-[100dvh] overflow-hidden bg-zinc-50');
   s = s.replaceAll('scrollbar-hidden relative inline-flex max-w-full gap-0.5 overflow-x-auto whitespace-nowrap', 'scrollbar-hidden relative flex w-full min-w-0 max-w-full gap-0.5 overflow-x-auto whitespace-nowrap');
   s = s.replaceAll('className:"space-y-6"', 'className:"min-w-0 max-w-full space-y-6 overflow-x-hidden"');
 
