@@ -41,63 +41,52 @@ for (const name of fs.readdirSync(dir)) {
   let s = fs.readFileSync(file, 'utf8');
   const before = s;
 
-  // --- Global modal compact mobile sheet ---
-  // Upstream modal panel exists in two variants. Force mobile to a fixed-height
-  // flex column. Header/footer stay visible; only body scrolls.
+  // --- Global modal mobile layout ---
+  // Keep dialogs taller on mobile, reserve safe-area space for iOS bottom toolbar,
+  // and let only the body scroll so footer actions stay visible.
   s = s.replaceAll(
     'relative z-10 w-full ${S} overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950',
-    'relative z-10 flex h-[68svh] max-h-[68svh] w-full ${S} flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 sm:h-auto sm:max-h-[92dvh]'
+    'relative z-10 w-full ${S} overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 flex h-[82svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-1rem)] flex-col sm:max-h-[92dvh]'
   );
   s = s.replaceAll(
     'relative z-10 flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden rounded-none border-0 border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 sm:h-auto sm:max-h-[92dvh]',
-    'relative z-10 flex h-[68svh] max-h-[68svh] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 sm:h-auto sm:max-h-[92dvh]'
+    'relative z-10 flex h-[82svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-1rem)] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 sm:h-auto sm:max-h-[92dvh]'
   );
   s = s.replaceAll(
     'h-[100svh] max-h-[100svh]',
-    'h-[68svh] max-h-[68svh]'
+    'h-[82svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-1rem)]'
   );
   s = s.replaceAll(
     'h-[78svh] max-h-[78svh] mb-[calc(env(safe-area-inset-bottom)+5.25rem)] sm:mb-0',
-    'h-[68svh] max-h-[68svh] sm:h-auto sm:max-h-[92dvh]'
+    'h-[82svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-1rem)] sm:h-auto sm:max-h-[92dvh]'
   );
 
-  // Outer overlay: keep centered with small padding so footer is visible.
-  s = s.replaceAll('fixed inset-0 z-[200] flex items-end justify-center p-0 sm:items-center sm:p-4', 'fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4');
+  // Outer overlay: center the dialog and reserve bottom safe-area padding.
+  s = s.replaceAll('fixed inset-0 z-[200] flex items-end justify-center p-0 sm:items-center sm:p-4', 'fixed inset-0 z-[200] flex items-center justify-center px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:p-4');
+  s = s.replaceAll('fixed inset-0 z-[200] flex items-center justify-center p-4', 'fixed inset-0 z-[200] flex items-center justify-center px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:p-4');
 
-  // Header compact + non-shrink. Hide long modal description on mobile to save height.
+  // Header/footer stay fixed within the modal; body scrolls independently.
   s = s.replaceAll(
     'flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4 dark:border-neutral-800',
-    'shrink-0 flex items-start justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-2.5 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95'
+    'shrink-0 flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4 dark:border-neutral-800'
   );
-  s = s.replaceAll(
-    'shrink-0 flex items-start justify-between gap-3 border-b border-slate-200 bg-white/95 px-5 py-3 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95',
-    'shrink-0 flex items-start justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-2.5 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95'
-  );
-  s = s.replaceAll('g?d.jsx("p",{className:"mt-1 text-sm text-slate-600 dark:text-white/65",children:g}):null', 'g?d.jsx("p",{className:"mt-0.5 hidden text-xs text-slate-600 dark:text-white/65 sm:block",children:g}):null');
 
   // Body owns all scrolling. Do not rely on page or panel scrolling.
   s = s.replaceAll('const at=D??"max-h-[70vh]",P=C??"overflow-y-auto",Ht=typeof window!="undefined"&&window.matchMedia("(max-width: 640px)").matches,mt=Ht?"flex-1 min-h-0 max-h-none":at;', 'const at=D??"max-h-[70vh]",P=C??"overflow-y-auto",Ht=typeof window!="undefined"&&window.matchMedia("(max-width: 640px)").matches,mt=Ht?"min-h-0 flex-1 max-h-none":at;');
-  s = s.replaceAll('px-5 py-4 pb-32 sm:pb-4', 'min-h-0 flex-1 overflow-y-scroll overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch] px-4 py-2.5 pb-3 sm:px-5 sm:py-4 sm:pb-4');
-  s = s.replaceAll('px-5 py-4 pb-44 sm:pb-4', 'min-h-0 flex-1 overflow-y-scroll overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch] px-4 py-2.5 pb-3 sm:px-5 sm:py-4 sm:pb-4');
-  s = s.replaceAll('min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y px-5 py-3 pb-6 sm:pb-4', 'min-h-0 flex-1 overflow-y-scroll overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch] px-4 py-2.5 pb-3 sm:px-5 sm:py-4 sm:pb-4');
+  s = s.replaceAll('min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y px-5 py-3 pb-6 sm:pb-4', 'min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch] px-5 py-3 pb-6 sm:pb-4');
 
-  // Footer compact and always visible as a flex child, not sticky to Safari toolbar.
-  s = s.replaceAll('className:"flex flex-wrap items-center justify-end gap-2 border-t border-slate-200 px-5 py-4 dark:border-neutral-800"', 'className:"shrink-0 flex flex-wrap items-center justify-end gap-2 border-t border-slate-200 px-4 py-2 dark:border-neutral-800"');
-  s = s.replaceAll('className:"flex flex-wrap items-center gap-2"', 'className:"flex flex-wrap items-center gap-1.5"');
+  // Footer compact and always visible above iOS safe area.
+  s = s.replaceAll('className:"flex flex-wrap items-center justify-end gap-2 border-t border-slate-200 px-5 py-4 dark:border-neutral-800"', 'className:"shrink-0 flex flex-wrap items-center justify-end gap-2 border-t border-slate-200 px-4 py-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] dark:border-neutral-800 sm:px-5 sm:py-4 sm:pb-4"');
   s = s.replaceAll('sticky bottom-0 z-30', 'shrink-0 z-30');
   s = s.replaceAll('sticky bottom-0 z-20', 'shrink-0 z-20');
-  s = s.replace(/,style:\{bottom:\/iPad\|iPhone\|iPod\/.test\(navigator\.userAgent\)\?"calc\(env\(safe-area-inset-bottom\) \+ 5\.5rem\)":"env\(safe-area-inset-bottom\)"\}/g, '');
-  s = s.replaceAll('px-5 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]', 'px-4 py-2.5 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]');
-  s = s.replaceAll('px-5 py-4 pb-[calc(env(safe-area-inset-bottom)+1.25rem)]', 'px-4 py-2.5 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]');
-  s = s.replaceAll('px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]', 'px-4 py-2.5 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]');
 
-  // AI provider modal: compact tabs/form and scroll body.
-  s = s.replaceAll('bodyHeightClassName:"max-h-[74vh]"', 'bodyHeightClassName:"max-h-none"');
-  s = s.replaceAll('bodyHeightClassName:"max-h-[82vh] sm:max-h-[74vh]"', 'bodyHeightClassName:"max-h-none"');
-  s = s.replaceAll('bodyHeightClassName:"max-h-[82svh] sm:max-h-[74vh]"', 'bodyHeightClassName:"max-h-none"');
-  s = s.replaceAll('bodyHeightClassName:"max-h-[62svh] sm:max-h-[74vh]"', 'bodyHeightClassName:"max-h-none"');
-  s = s.replaceAll('bodyClassName:"!px-0 !py-0"', 'bodyClassName:"!px-0 !py-0 min-h-0 flex-1 overflow-y-scroll overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch]"');
-  s = s.replaceAll('bodyClassName:"!px-0 !py-0 overscroll-contain touch-pan-y"', 'bodyClassName:"!px-0 !py-0 min-h-0 flex-1 overflow-y-scroll overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch]"');
+  // AI provider modal: keep full scrolling body on mobile.
+  s = s.replaceAll('bodyHeightClassName:"max-h-[74vh]"', 'bodyHeightClassName:"min-h-0 flex-1 max-h-none sm:max-h-[74vh]"');
+  s = s.replaceAll('bodyHeightClassName:"max-h-[82vh] sm:max-h-[74vh]"', 'bodyHeightClassName:"min-h-0 flex-1 max-h-none sm:max-h-[74vh]"');
+  s = s.replaceAll('bodyHeightClassName:"max-h-[82svh] sm:max-h-[74vh]"', 'bodyHeightClassName:"min-h-0 flex-1 max-h-none sm:max-h-[74vh]"');
+  s = s.replaceAll('bodyHeightClassName:"max-h-[62svh] sm:max-h-[74vh]"', 'bodyHeightClassName:"min-h-0 flex-1 max-h-none sm:max-h-[74vh]"');
+  s = s.replaceAll('bodyClassName:"!px-0 !py-0"', 'bodyClassName:"!px-0 !py-0 min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch]"');
+  s = s.replaceAll('bodyClassName:"!px-0 !py-0 overscroll-contain touch-pan-y"', 'bodyClassName:"!px-0 !py-0 min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch]"');
   s = s.replaceAll('className:"sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-5 py-3 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95"', 'className:"sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-2 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95"');
   s = s.replaceAll('className:"px-5 py-4"', 'className:"px-4 py-2.5 pb-3 sm:px-5 sm:py-4"');
   s = s.replaceAll('className:"px-5 py-4 pb-28 sm:pb-6"', 'className:"px-4 py-2.5 pb-3 sm:px-5 sm:py-4"');
