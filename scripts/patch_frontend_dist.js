@@ -46,24 +46,24 @@ for (const name of fs.readdirSync(dir)) {
   // and let only the body scroll so footer actions stay visible.
   s = s.replaceAll(
     'relative z-10 w-full ${S} overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950',
-    'relative z-10 w-full ${S} overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 flex h-[82svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-1rem)] flex-col sm:max-h-[92dvh]'
+    'relative z-10 w-full ${S} overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 flex h-[88svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-0.5rem)] flex-col sm:max-h-[92dvh]'
   );
   s = s.replaceAll(
     'relative z-10 flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden rounded-none border-0 border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 sm:h-auto sm:max-h-[92dvh]',
-    'relative z-10 flex h-[82svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-1rem)] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 sm:h-auto sm:max-h-[92dvh]'
+    'relative z-10 flex h-[88svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-0.5rem)] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950 sm:h-auto sm:max-h-[92dvh]'
   );
   s = s.replaceAll(
     'h-[100svh] max-h-[100svh]',
-    'h-[82svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-1rem)]'
+    'h-[88svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-0.5rem)]'
   );
   s = s.replaceAll(
     'h-[78svh] max-h-[78svh] mb-[calc(env(safe-area-inset-bottom)+5.25rem)] sm:mb-0',
-    'h-[82svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-1rem)] sm:h-auto sm:max-h-[92dvh]'
+    'h-[88svh] max-h-[calc(100svh-env(safe-area-inset-bottom)-0.5rem)] sm:h-auto sm:max-h-[92dvh]'
   );
 
   // Outer overlay: center the dialog and reserve bottom safe-area padding.
-  s = s.replaceAll('fixed inset-0 z-[200] flex items-end justify-center p-0 sm:items-center sm:p-4', 'fixed inset-0 z-[200] flex items-center justify-center px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:p-4');
-  s = s.replaceAll('fixed inset-0 z-[200] flex items-center justify-center p-4', 'fixed inset-0 z-[200] flex items-center justify-center px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:p-4');
+  s = s.replaceAll('fixed inset-0 z-[200] flex items-end justify-center p-0 sm:items-center sm:p-4', 'fixed inset-0 z-[200] flex items-center justify-center px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] sm:p-4');
+  s = s.replaceAll('fixed inset-0 z-[200] flex items-center justify-center p-4', 'fixed inset-0 z-[200] flex items-center justify-center px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] sm:p-4');
 
   // Header/footer stay fixed within the modal; body scrolls independently.
   s = s.replaceAll(
