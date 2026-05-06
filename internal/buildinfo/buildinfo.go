@@ -5,7 +5,7 @@ package buildinfo
 // Defaults cover local development builds.
 var (
 	// Version is the semantic version or git describe output of the binary.
-	Version = "v2.0.15"
+	Version = "v2.0.16"
 
 	// Commit is the git commit SHA baked into the binary.
 	Commit = "none"
@@ -14,7 +14,7 @@ var (
 	BuildDate = "unknown"
 
 	// FrontendVersion is the management panel version baked into this binary image.
-	FrontendVersion = "v2.0.15"
+	FrontendVersion = "v2.0.16"
 
 	// FrontendCommit is the codeProxy commit SHA baked into this binary image.
 	FrontendCommit = "none"
