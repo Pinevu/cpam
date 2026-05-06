@@ -1,7 +1,7 @@
 # ── Frontend source ──────────────────────────────────────────────────────────
 FROM --platform=$BUILDPLATFORM alpine:3.22.0 AS frontend-source
 
-ARG FRONTEND_REPOSITORY=https://github.com/kittors/codeProxy.git
+ARG FRONTEND_REPOSITORY=https://github.com/Pinevu/codeProxy.git
 ARG FRONTEND_REF=main
 ARG FRONTEND_COMMIT=
 
@@ -21,13 +21,17 @@ RUN git clone --depth=1 --branch "${FRONTEND_REF}" "${FRONTEND_REPOSITORY}" fron
     && git checkout --detach "${FRONTEND_COMMIT}"; \
   fi
 
+# Copy the patch script from build context into the frontend source tree so it
+# survives the COPY --from=frontend-source step in the next stage.
+COPY scripts/patch_frontend_dist.js /src/frontend/scripts/patch_frontend_dist.js
+
 # ── Frontend build ───────────────────────────────────────────────────────────
 FROM --platform=$BUILDPLATFORM oven/bun:1 AS frontend-builder
 
 WORKDIR /frontend
 COPY --from=frontend-source /src/frontend/ .
 ARG UI_VERSION=dev
-ARG FRONTEND_REPOSITORY=https://github.com/kittors/codeProxy.git
+ARG FRONTEND_REPOSITORY=https://github.com/Pinevu/codeProxy.git
 ARG FRONTEND_REF=main
 ARG FRONTEND_COMMIT=none
 ARG BUILD_DATE=unknown
@@ -37,9 +41,8 @@ ENV VITE_PANEL_REF=${FRONTEND_REF}
 ENV VITE_PANEL_COMMIT=${FRONTEND_COMMIT}
 ENV VITE_PANEL_BUILD_DATE=${BUILD_DATE}
 RUN bun install --frozen-lockfile
-COPY scripts/patch_frontend_dist.js /tmp/patch_frontend_dist.js
 RUN bunx vite build \
-  && node /tmp/patch_frontend_dist.js /frontend/dist/assets
+  && node /frontend/scripts/patch_frontend_dist.js /frontend/dist/assets
 
 # ── Backend build ────────────────────────────────────────────────────────────
 FROM --platform=$BUILDPLATFORM golang:1.26.1-alpine AS backend-builder
