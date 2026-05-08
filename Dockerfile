@@ -1,5 +1,4 @@
-# ── Frontend source ──────────────────────────────────────────────────────────
-FROM --platform=$BUILDPLATFORM alpine:3.22.0 AS frontend-source
+FROM alpine:3.22.0 AS frontend-source
 
 ARG FRONTEND_REPOSITORY=https://github.com/Pinevu/codeProxy.git
 ARG FRONTEND_REF=main
@@ -26,7 +25,7 @@ RUN git clone --depth=1 --branch "${FRONTEND_REF}" "${FRONTEND_REPOSITORY}" fron
 COPY scripts/patch_frontend_dist.js /src/frontend/scripts/patch_frontend_dist.js
 
 # ── Frontend build ───────────────────────────────────────────────────────────
-FROM --platform=$BUILDPLATFORM oven/bun:1 AS frontend-builder
+FROM oven/bun:1 AS frontend-builder
 
 WORKDIR /frontend
 COPY --from=frontend-source /src/frontend/ .
@@ -45,7 +44,7 @@ RUN bunx vite build \
   && node /frontend/scripts/patch_frontend_dist.js /frontend/dist/assets
 
 # ── Backend build ────────────────────────────────────────────────────────────
-FROM --platform=$BUILDPLATFORM golang:1.26.1-alpine AS backend-builder
+FROM golang:1.26.1-alpine AS backend-builder
 
 WORKDIR /app
 

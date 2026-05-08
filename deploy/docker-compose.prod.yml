@@ -6,13 +6,13 @@ services:
       context: ..
       dockerfile: Dockerfile
       args:
-        VERSION: v2.0.19
+        VERSION: v2.0.25
         COMMIT: local-ui-fix
         BUILD_DATE: ${BUILD_DATE:-unknown}
-        UI_VERSION: v2.0.19
+        UI_VERSION: v2.0.25
         FRONTEND_REPOSITORY: https://github.com/Pinevu/codeProxy.git
         FRONTEND_REF: main
-    image: cpam:v2.0.19
+    image: cpam:v2.0.25
     container_name: cpam
     restart: unless-stopped
     environment:
@@ -33,7 +33,7 @@ services:
       - ../data:/CLIProxyAPI/data
 
   clirelay-updater:
-    image: cpam:v2.0.19
+    image: cpam:v2.0.25
     container_name: cpam-updater
     restart: unless-stopped
     command: ["./clirelay-updater"]
